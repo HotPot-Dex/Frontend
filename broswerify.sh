@@ -1,0 +1,1 @@
+browserify ./jss/App.js -o ./dist/App.js

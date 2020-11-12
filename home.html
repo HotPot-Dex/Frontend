@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>HotPot Dex</title>
+	<link rel="canonical" href="https://hotpotdex.io">
+	<link rel="shortcut icon" href="images/hotpoticon.png">
+	<meta name="theme-color" content="#433030">
+	<link rel="preconnect" href="https://mainnet.eth.aragon.network" crossorigin>
+	<link rel="preconnect" href="https://cdnjs.cloudflare.com/" crossorigin>
+	<link rel=" preconnect" href="https://stackpath.bootstrapcdn.com/" crossorigin>
+	<link rel=" preconnect" href="https://raw.githubusercontent.com" crossorigin>
+
+	<link rel="icon" href="images/hotpoticon.png">
+
+	<script src="js/jquery.min.js" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="js/bignumber.min.js"></script>
+	<script type="text/javascript" src="dist/App.js"></script>
+	<link rel="stylesheet" href="styles/tablestyle.css">
+
+	<!-- <script type="text/javascript" src="js/truffle-contract.js"></script> -->
+	<link href="styles/buttons.css" rel="stylesheet">
+	<link href="styles/table.css" rel="stylesheet">
+	<link href="styles/googleapis.css" rel="stylesheet">
+	<meta name="viewport" content="width=500, initial-scale=1">
+
+	<link rel="stylesheet" href="styles/bootstrap.min.css" crossorigin="anonymous">
+
+	<link rel='stylesheet' href='styles/styles.css' />
+
+	<script>
+		(function ($) {
+			$.fn.animateNumbers = function (stop, commas, duration, ease) {
+				return this.each(function () {
+					var $this = $(this);
+					var isInput = $this.is('input');
+					var start = parseInt(isInput ? $this.val().replace(/,/g, "") : $this.text().replace(/,/g, ""));
+					var regex = /(\d)(?=(\d\d\d)+(?!\d))/g;
+					commas = commas === undefined ? true : commas;
+
+					// number inputs can't have commas or it blanks out
+					if (isInput && $this[0].type === 'number') {
+						commas = false;
+					}
+
+					$({ value: start }).animate({ value: stop }, {
+						duration: duration === undefined ? 1000 : duration,
+						easing: ease === undefined ? "swing" : ease,
+						step: function () {
+							isInput ? $this.val(Math.floor(this.value)) : $this.text(Math.floor(this.value));
+							if (commas) {
+								isInput ? $this.val($this.val().replace(regex, "$1,")) : $this.text($this.text().replace(regex, "$1,"));
+							}
+						},
+						complete: function () {
+							if (parseInt($this.text()) !== stop || parseInt($this.val()) !== stop) {
+								isInput ? $this.val(stop) : $this.text(stop);
+								if (commas) {
+									isInput ? $this.val($this.val().replace(regex, "$1,")) : $this.text($this.text().replace(regex, "$1,"));
+								}
+							}
+						}
+					});
+				});
+			};
+		})(jQuery);
+
+	</script>
+</head>
+
+<body class="text-center">
+
+	<div class="content">
+		<div class="alert_content" id="alertdiv"></div>
+
+		<div id="light" class="white_content">
+			<span style="color: black;text-align: center;font-size: 24px;" id="popTitle"></span>　　　
+			<button style="height: 40px;width: 40px; position: absolute;right: 20px;border-style: none;"
+				onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">X</button>
+			<div style="color: black;margin-top: 10%;">
+				<span id="maxAvaliable">100</span><span> </span><span id="stakeToken"> HotPot/Eth LP</span> Avaliable
+			</div>　　
+			<input name="name" type="number" style="width: 50%;" autofocus="autofocus" value="0" id="stakeInput">
+			<button onclick="Stake.maxStake()">MAX</button>
+
+			<div id="stakediv">
+				<a data-lang="stake" style="width: 60%;margin-bottom: 10%;margin-top: 10%;" onclick="Stake.stakeSure()"
+					class="card-link btn btn-primary btn-lg">
+					Stake
+				</a>
+			</div>
+			<div id="withdrawdiv">
+				<a data-lang="withdraw" style="width: 60%;margin-bottom: 10%;margin-top: 10%;"
+					onclick="Stake.withdrawSure()" class="card-link btn btn-primary btn-lg">
+					Withdraw
+				</a>
+			</div>
+			<div>
+				<a data-lang="cancle" style="width: 60%;"
+					onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"
+					class="card-link btn btn-primary btn-lg">
+					Cancle
+				</a>
+			</div>
+		</div>
+
+		<div id="divsell" class="white_content">
+			<span style="color: black;text-align: center;font-size: 24px;" class="popTitle">Sell</span>　　　
+			<button style="height: 40px;width: 40px; position: absolute;right: 20px;border-style: none;"
+				onclick="document.getElementById('divsell').style.display='none';document.getElementById('fade').style.display='none'">X</button>
+
+			<div id="priceinputdiv">
+				<div style="color: black;margin-top: 10%;">
+					<span id="sellToken"> </span> , <span data-lang="inputprice"></span>
+				</div>　　
+				<input name="name" type="number" style="width: 50%;margin-top: 5%;" autofocus="autofocus" value="0"
+					class="stakeInput"> <span style="color: black;" id='priceunit'>HotPot</span>
+
+			</div>
+
+			<div class="divloan">
+				<p style="color: black;margin-top: 2%;" data-lang="inputtime"></p>
+				<input name="name" type="number" style="width: 50%;" autofocus="autofocus" value="0" class="loanInput">
+				<span style="color: black;">Day</span>
+			</div>
+
+			<div id='iddiv' hidden></div>
+			<div id="selldiv">
+				<a data-lang="sell" style="width: 60%;margin-bottom: 10%;margin-top: 10%;" onclick="Market.sellSure()"
+					class="card-link btn btn-primary btn-lg">
+					Sell
+				</a>
+			</div>
+			<div id="loandiv">
+				<a data-lang="loan" style="width: 60%;margin-bottom: 10%;margin-top: 10%;" onclick="Loan.loanSure()"
+					class="card-link btn btn-primary btn-lg">
+					Loan
+				</a>
+			</div>
+			<div id="borrowdiv">
+				<a data-lang="borrow" style="width: 60%;margin-bottom: 10%;margin-top: 10%;" onclick="Loan.borrowSure()"
+					class="card-link btn btn-primary btn-lg">
+					Borrow
+				</a>
+			</div>
+			<div>
+				<a data-lang="cancle" style="width: 60%;"
+					onclick="document.getElementById('divsell').style.display='none';document.getElementById('fade').style.display='none'"
+					class="card-link btn btn-primary btn-lg">
+					Cancle
+				</a>
+			</div>
+		</div>
+
+
+		<div id="fade" class="black_overlay"></div>
+
+		<div id="msgBox" hidden>
+			<a href="https://beosin.com/#/" target="_blank"><img src="images/verifyHorizontal.png" width=200
+					height=70></a>
+		</div>
+
+
+		<div class="container d-flex w-100 h-100 mx-auto flex-column" style="z-index: 1;">
+			<header class="masthead">
+				<div class="inner">
+					<h3 class="masthead-brand" onclick="nav('home')">HotPot Dex</h3>
+					<nav class="nav nav-masthead justify-content-center">
+						<a id="ahome" class="nav-link" href="#home" onclick="nav('home')" data-lang="home">HOME</a>
+						<a id="afarms" class="nav-link" href="#farm" onclick="nav('farms')" data-lang="farm">FARM</a>
+						<a id="agacha" class="nav-link" href="#ticket" onclick="nav('gacha')"
+							data-lang="ticket">GACHA</a>
+						<a id="areward" class="nav-link" href="#bonus" onclick="nav('reward')"
+							data-lang="bonus">BONUS</a>
+						<a id="aexchange" class="nav-link" href="#exchange" onclick="nav('exchange')"
+							data-lang="exchange">EXCHANGE</a>
+						<a id="ame" class="nav-link" href="#me" onclick="nav('me')" data-lang="me">MY</a>
+						<a id="ainvite" class="nav-link" href="#invite" onclick="nav('invite')"
+							data-lang="invite">INVITE</a>
+						<a id="aabout" class="nav-link" href="#about" onclick="nav('about')" data-lang="about">ABOUT</a>
+						<a class="nav-link" href="#" onclick="App.changelang()" id="changelang">EN</a>
+					</nav>
+				</div>
+			</header>
+			<a target="_blank" href="#" id="toprightmsg" STYLE="DISPLAY:NONE"></a>
+
+			<a target="_blank" href="#" id="importantmsg" STYLE="DISPLAY:NONE"></a>
+
+			<a id="globalmsg" target="_blank" href="http://etherscan.com/" STYLE="DISPLAY:NONE">
+				<span data-lang="congratulations"></span>
+				<span id="gachauser">XXX</span>
+				<span data-lang="congratulations1"></span></a>
+			<div id="infodiv">
+				<h3 class="mt-2 mb-4 cover-container" data-lang="string_info">
+				</h3>
+				<h3 class="mt-2 mb-4 cover-container" data-lang="string_info1" hidden>
+				</h3>
+				<h3 class="mt-2 mb-4  cover-container" data-lang="string_info2" hidden>
+				</h3>
+				<h3 class="mt-2 mb-4  cover-container" data-lang="string_info3" hidden>
+				</h3>
+			</div>
+			<div id="divloading" style="display: none;">
+				<div class="spinner">
+					<div class="rect1"></div>
+					<div class="rect2"></div>
+					<div class="rect3"></div>
+					<div class="rect4"></div>
+					<div class="rect5"></div>
+				</div>
+				<div data-lang="loading"></div>
+			</div>
+
+			<main role="main" class="inner cover pt-2 home mt-4">
+				<p class="lead"></p>
+				<p class="lead web3false" onclick="App.connectMetamask()">
+					<img loading="lazy" src="images/metamask.png" alt="MetaMask" width="42" height="42">
+					<button class='green button'>MetaMask</button>
+
+				</p>
+				<p class="lead web3false" style="margin-top: 5%;" onclick="App.connectWallet()">
+					<img loading="lazy" src="images/wallectconnect.png" alt="WalletConnect" width="42" height="42">
+					<button class='green button'>WalletConnect</button>
+
+				</p>
+
+				<div class="cover-container mx-auto">
+					<div class="card swapcard hide web3true">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="yourbalance">YOUR BALANCE</h6>
+							<H3 class="card-text balance"><span class='mybalance'>-.----</span> HotPot</H3>
+							<a href="#farms" onclick="nav('farms')" class="card-link btn btn-primary btn-lg"
+								data-lang="farm">FARM</a>
+						</div>
+					</div>
+					<div class="card swapcard hide web3true">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="yourticket">YOUR TICKET</h6>
+							<H3 class="card-text "><span class="myticketbalance">0</span> <span
+									data-lang="ticketdw">TICKET</span></H3>
+							<a href="#farms" onclick="nav('gacha')" class="card-link btn btn-primary btn-lg"
+								data-lang="getticket">GACHA</a>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="tokenprice">TOKEN PRICE</h6>
+							<H3 class="card-text tokenprice">-.----</H3>
+							<a target="_blank"
+								href="https://justswap.org/#/scan/detail/trx/TUHVUsg8hvR4TxmWAbfvKTKwGdrqArmYsv"
+								class="card-link btn btn-primary btn-lg" data-lang="buy">BUY</a>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="totalreward">Total Reward</h6>
+							<H3 class="card-text totalreward">-.----</H3>
+							<a href="#reward" onclick="nav('reward')" class="card-link btn btn-primary btn-lg"
+								data-lang="reward">Reward</a>
+						</div>
+					</div>
+					<div class="card swapcard hide web3true" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="totalticket">TOTAL TICKET</h6>
+							<H3 class="card-text ">
+								<span class="ticketbalance">0</span>
+								<span data-lang="ticketdw">TICKET</span>
+							</H3>
+							<a href="#exchange" onclick="nav('exchange')" class="card-link btn btn-primary btn-lg"
+								data-lang="gotoexchange">EXCHANGE</a>
+
+						</div>
+					</div>
+					<div class="card hide web3true swapcard2">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="totalvaluestaked">Total value staked
+							</h6>
+							<H3 class="card-text tvl">$<span id="totalstake">0</span></H3>
+						</div>
+					</div>
+
+					<div class="card hide web3true swapcard2" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning">Total Mined</h6>
+							<H3 class="card-text mcap">$<span>-.----</span></H3>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard2">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="totalsupply">Total Supply</h6>
+							<H3 class="card-text mcap"><span id="totalcir"></span>HotPot</H3>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard2" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="ticketprice">Ticket Average Price
+							</h6>
+							<H3 class="card-text mcap">$<span>1200.00 </span> </H3>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard2" hidden>
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="ticketrent">Ticket Rent Price</h6>
+							<H3 class="card-text mcap">$<span>120.00</span>/<span data-lang="day">Day</span> </H3>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<main role="main" class="inner cover about" STYLE="DISPLAY:NONE">
+				<p class="aboutp" data-lang="about1" style="margin-top: 5%;">
+
+				</p>
+				<p class="aboutp" data-lang="about2">
+
+				</p>
+
+				<p class="aboutp" data-lang="about3">
+
+				</p>
+				<p class="aboutp" data-lang="about4">
+
+				</p>
+				<p class="aboutp" data-lang="about5">
+
+				</p>
+				<p style="margin-top: 5%;font-size: 30px;">HotPot Dex RoadMap</p>
+				<section id="cd-timeline" class="cd-container" style="text-align: left;">
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-movie">
+						</div> <!-- cd-timeline-img -->
+
+						<div class="cd-timeline-content">
+							<h2 data-lang="0weekhead">Project Launched</h2>
+							<p data-lang="0weekbody">Genesis Mining started. Project beta launched. All function starts, such as HotPot liquid
+								mining, NFT member card gacha, NFT market and loan, member card dividends.</p>
+							<ul class="content-skills">
+								<li>Liquidity Mining</li>
+								<li>NFT Gacha</li>
+								<li>Market</li>
+								<li>Loan</li>
+								<li>Dividends</li>
+								<li>Invite</li>
+							</ul>
+							<span class="cd-date">Launched</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-picture">
+						</div> <!-- cd-timeline-img -->
+
+						<div class="cd-timeline-content">
+							<h2 data-lang="2weekhead">New Frontend Launched</h2>
+							<p  data-lang="2weekbody">The whole new frontend will launch. The new systems and user interface have been
+								optimised.</p>
+							<span class="cd-date">2 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-location">
+						</div> <!-- cd-timeline-img -->
+
+						<div class="cd-timeline-content">
+							<h2  data-lang="4weekhead">Audit</h2>
+							<p data-lang="4weekbody">Get the project contract audit result. The project will be formally launched. </p>
+							<span class="cd-date">4 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-location">
+						</div>
+
+						<div class="cd-timeline-content">
+							<h2 data-lang="4weekhead2">Vote for New Mining Pool</h2>
+							<p data-lang="4weekbody2">Two new mining pool will be launched. The stake token will be choosen by community
+								voting.</p>
+							<span class="cd-date">4 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-movie">
+						</div> <!-- cd-timeline-img -->
+
+						<div class="cd-timeline-content">
+							<h2  data-lang="6weekhead">Partner Project Put on Market</h2>
+							<p data-lang="6weekbody">Our cooperation partners will launch their NFT project on HotPot Dex. The HotPot will be
+								the official token. The transaction fees is transferred to dividends pool. </p>
+							<span class="cd-date">6 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-location">
+						</div>
+
+						<div class="cd-timeline-content">
+							<h2  data-lang="8weekhead">Vote for New Mining Pool</h2>
+							<p data-lang="8weekbody">Last two new mining pool will be launched. The stake token will be choosen by community
+								voting.</p>
+							<span class="cd-date">8 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+					<div class="cd-timeline-block">
+						<div class="cd-timeline-img cd-location">
+						</div>
+
+						<div class="cd-timeline-content">
+							<h2  data-lang="12weekhead">Decentralized Protocol for Automated NFT Liquidity Provision</h2>
+							<p data-lang="12weekbody">Our goal is making NFT selling and loaning more funny and profitable. We want to create a
+								new protocol for NFT liquidity provision. Now it's the time to show it. </p>
+							<span class="cd-date">12 Weeks</span>
+						</div> <!-- cd-timeline-content -->
+					</div> <!-- cd-timeline-block -->
+
+				</section> <!-- cd-timeline -->
+			</main>
+
+			<main role="main" class="inner cover invite" STYLE="DISPLAY:NONE">
+				<div class="cover-container mx-auto">
+					<div class="card hide web3true swapcard2" style="height: 180px;">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="myinvitecode"></h6>
+							<H3 class="card-text tvl" style="margin-top: 15%;display: none;" id='myinvitecode'>8888</H3>
+							<p data-lang="getinvitecode" id="nocodetip" style="display: block;margin-top: 15%;"></p>
+						</div>
+					</div>
+					<div class="card hide web3true swapcard2" style="height: 180px;">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="invitecount"></h6>
+							<p class="card-text tvl"><span data-lang="totalinvite"></span> : <span
+									id='totalinvite'></span></p>
+							<p class="card-text tvl"><span data-lang="validateinvite"></span> : <span
+									id='validateinvite'></span></p>
+							<p class="card-text tvl"><span data-lang="claimratioup"></span> : <span
+									id='claimratioup'></span></p>
+						</div>
+					</div>
+
+				</div>
+				<div style="margin-top: 2%;" id='inputinvitecode'>
+					<input name="name" type="number" style="width: 200px;" autofocus="autofocus" value=""
+						id="inviteInput">
+					<button class='green button' data-lang='btninvite' onclick="Invite.inputCode()"></button>
+				</div>
+				<div style="margin-top: 2%;display: none;" data-lang="inviteinputed" id='inviteinputed'>
+
+				</div>
+				<div style="margin-top: 2%;display: none;" data-lang="invitevalidated" id='invitevalidated'>
+
+				</div>
+
+				<p style="margin-top: 10%;" data-lang="inviteinto0"></p>
+				<p data-lang="inviteinto1"></p>
+				<p data-lang="inviteinto2"></p>
+				<p data-lang="inviteinto3"></p>
+				<p data-lang="inviteinto4"></p>
+			</main>
+
+			<main role="main" class="inner cover gacha" STYLE="DISPLAY:NONE">
+				<div class="card swapcard  web3true" style="height: 200px !important;">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="totalticket">TOTAL TICKET</h6>
+						<H3 class="card-text ">
+							<span class="ticketbalance">0</span>
+							<span data-lang="ticketdw">TICKET</span>
+						</H3>
+						<p style="margin-top: 10%;"><span data-lang="posibilityinfo"></span><span
+								id='posibilitynow'>1/8</span></p>
+						<p><span data-lang="posibilityinfo1"></span><span id='posibilitylater'>1/16</span></p>
+					</div>
+				</div>
+				<div class="card swapcard  web3true" style="height: 200px !important;">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="yourticket">YOUR TICKET</h6>
+						<H3 class="card-text "><span class="myticketbalance">0</span> <span
+								data-lang="ticketdw">TICKET</span></H3>
+						<a href="#farms" id="approvegacha" onclick="Gacha.approve()"
+							class="card-link btn btn-primary btn-lg" data-lang="approvegacha">APPROVE</a>
+						<a STYLE="DISPLAY:NONE" href="#farms" id="pull1" onclick="Gacha.pull()"
+							class="card-link btn btn-primary btn-lg" data-lang="pull1">抽卡</a>
+						<a STYLE="DISPLAY:NONE" href="#farms" id="pull10" onclick="Gacha.pull10()"
+							class="card-link btn btn-primary btn-lg" data-lang="pull10">十连抽</a>
+						<p style="margin-top: 3%;" data-lang="gachainfo"></p>
+					</div>
+				</div>
+			</main>
+
+
+			<main role="main" class="inner cover exchange" STYLE="DISPLAY:NONE">
+				<div class="card swapcard hide web3true" style="height: 170px !important;" hidden>
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="markettitle"></h6>
+						<p><span data-lang="volume"></span>$20000</p>
+						<p><span data-lang="transaction"></span>14 <span data-lang="ticketdw"></span></p>
+						<p><span data-lang="averageprice"></span>$1000</p>
+					</div>
+				</div>
+				<div class="card swapcard hide web3true" style="height: 170px !important;" hidden>
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="loantitle"></h6>
+						<p><span data-lang="volume"></span>$2000</p>
+						<p><span data-lang="transaction"></span>14 <span data-lang="ticketdw"></span></p>
+						<p><span data-lang="averageprice"></span>$100/day</p>
+					</div>
+				</div>
+				<p style="margin:3% 3%" data-lang="kinfo"></p>
+
+				<table cellspacing="0">
+					<tr style="height: 50px!important;">
+						<th class='selectth tableselect' data-lang="selectbuy" id='selectbuy' onclick="App.selectBuy()">
+							Buy</th>
+						<th class='selectth' data-lang="selectloan" id='selectloan' onclick="App.selectLoan()">Loan</th>
+					</tr>
+				</table>
+
+				<div class="table-users" id="divbuytable" style="display: block;">
+					<p data-lang="marketupdate"></p>
+					<table cellspacing="0" id="tablesell">
+					</table>
+				</div>
+
+				<div class="table-users" id="divloantable" style="display: none;">
+					<p data-lang="loanmin"></p>
+					<table cellspacing="0" id="tableloan">
+
+					</table>
+
+				</div>
+
+				<div id='sellhistory' style="display: block;">
+					<p style="margin-top: 5%;color: wheat;font-size:larger!important;" data-lang="sellhistory"></p>
+					<table cellspacing="0" id="tablesellhistory">
+
+					</table>
+				</div>
+
+				<div id='loanhistory' style="display: none;">
+					<p style="margin-top: 5%;color: wheat;font-size:larger!important;" data-lang="loanhistory"></p>
+					<table cellspacing="0" id="tableloanhistory">
+
+					</table>
+				</div>
+
+
+			</main>
+
+			<main role="main" class="inner cover reward" STYLE="DISPLAY:NONE">
+				<div class="card hide web3true swapcard">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="totalreward">Total Reward</h6>
+						<H3 class="card-text totalreward">-.----</H3>
+						<a class="card-link btn btn-primary btn-lg" onclick="Reward.claim()"
+							data-lang="reward">Reward</a>
+						<p style="margin-top: 5%;"><span data-lang="memberinfo"></span><span
+								id="rewardpercard">100.0</span> HotPot</p>
+					</div>
+				</div>
+				<div class="card swapcard  web3true">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="yourticket">YOUR TICKET</h6>
+						<H3 class="card-text "><span class="myticketbalance">0</span> <span
+								data-lang="ticketdw">TICKET</span></H3>
+
+						<p><span data-lang="normalcard"></span> : <span id="grade1num">0</span> (<span
+								data-lang="available"></span> : <span id="grade1unuse">0</span>)</p>
+						<p><span data-lang="goldcard"></span> : <span id="grade2num">0</span> (<span
+								data-lang="available"></span> : <span id="grade2unuse">0</span>)</p>
+						<p><span data-lang="epiccard"></span> : <span id="grade3num">0</span> (<span
+								data-lang="available"></span> : <span id="grade3unuse">0</span>)</p>
+					</div>
+				</div>
+
+			</main>
+
+			<main role="main" class="inner cover me" STYLE="DISPLAY:NONE">
+				<div class="card swapcard hide web3true" style="height: 170px !important;">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="yourbalance">YOUR BALANCE</h6>
+						<H3 class="card-text balance"><span class='mybalance'>-.----</span> HotPot</H3>
+						<a href="#farms" onclick="nav('farms')" class="card-link btn btn-primary btn-lg"
+							data-lang="farm">FARM</a>
+					</div>
+				</div>
+				<div class="card swapcard hide web3true" style="height: 170px !important;">
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="yourticket">YOUR TICKET</h6>
+						<H3 class="card-text "><span class="myticketbalance">0</span> <span
+								data-lang="ticketdw">TICKET</span></H3>
+						<a href="#farms" onclick="nav('gacha')" class="card-link btn btn-primary btn-lg"
+							data-lang="getticket">GACHA</a>
+					</div>
+				</div>
+				<div class="card swapcard hide web3true" style="height: 170px !important;" hidden>
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="myloan">MY LOAN</h6>
+						<H3 class="card-text "><span class="myloan">0</span> <span data-lang="ticketdw">TICKET</span>
+						</H3>
+						<a href="#farms" onclick="nav('exchange')" class="card-link btn btn-primary btn-lg"
+							data-lang="loan">LOAN</a>
+					</div>
+				</div>
+				<div class="card swapcard hide web3true" style="height: 170px !important;" hidden>
+					<div class="card-body">
+						<h6 class="card-subtitle mb-2 text-warning" data-lang="mysell">MY SELL</h6>
+						<H3 class="card-text "><span class="mysell">0</span> <span data-lang="ticketdw">TICKET</span>
+						</H3>
+						<a href="#farms" onclick="nav('exchange')" class="card-link btn btn-primary btn-lg"
+							data-lang="market">MARKET</a>
+					</div>
+				</div>
+
+
+			</main>
+
+
+			<main role="main" class="inner cover farms " style="display:none">
+				<div class="cover-container mx-auto" style="max-width: 62em;">
+					<div class="card swapcard">
+						<span class="badge badge-warning yield-badge">16x</span>
+						<span class="badge badge-success time-badge decresebadge2" style="display: none;"><span
+								data-lang="decrease"></span> : <span class="reducetime2">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge startbadge2" style="display: none;"><span
+								data-lang="starttime"></span> : <span class="starttime2">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge endbadge2" style="display: none;"><span
+								data-lang="endbadge"></span></span>
+						<div class="card-body">
+							<div class="tokenpair">
+								<div class="token1 hotpot"></div>
+								<div class="token2 eth"></div>
+							</div>
+							<h6 class="card-subtitle mb-2 text-warning">HotPot/ETH UniV2-LP</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldhotpoteth">---.-%</span></H3>
+							<a href="#poolhotpot/eth" onclick="nav('poolhotpot/eth')"
+								class="card-link btn btn-primary btn-lg" data-lang="farm">
+								Farm
+							</a>
+							<a href="https://info.uniswap.org/home" target="_blank"
+								class="card-link btn btn-primary btn-lg" data-lang="trade">
+								Trade
+							</a>
+						</div>
+					</div>
+
+					<div class="card swapcard">
+						<div class="card-body">
+							<span class="badge badge-warning yield-badge">5x</span>
+							<span class="badge badge-success time-badge decresebadge2" style="display: none;"><span
+									data-lang="decrease"></span> : <span class="reducetime2">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge startbadge2" style="display: none;"><span
+									data-lang="starttime"></span> : <span class="starttime2">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge endbadge2" style="display: none;"><span
+									data-lang="endbadge"></span></span>
+							<div class="token hotpot"></div>
+							<h6 class="card-subtitle mb-2 text-warning">HotPot</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldhotpot">---.-%</span></H3>
+							<a href="#poolhotpot" onclick="nav('poolhotpot')" class="card-link btn btn-primary btn-lg"
+								data-lang="farm">
+								Farm
+							</a>
+							<a href="https://info.uniswap.org/home" target="_blank"
+								class="card-link btn btn-primary btn-lg" data-lang="trade">
+								Trade
+							</a>
+						</div>
+					</div>
+
+					<div class="card swapcard">
+						<div class="card-body">
+							<span class="badge badge-warning yield-badge">2x</span>
+							<span class="badge badge-success time-badge decresebadge" style="display: none;"><span
+									data-lang="decrease"></span> : <span class="reducetime">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge startbadge" style="display: none;"><span
+									data-lang="starttime"></span> : <span class="starttime">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge endbadge" style="display: none;"><span
+									data-lang="endbadge"></span></span>
+							<div class="token usdt"></div>
+							<h6 class="card-subtitle mb-2 text-warning">USDT</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldusdt">---.-%</span></H3>
+							<a href="#poolusdt" onclick="nav('poolusdt')" class="card-link btn btn-primary btn-lg"
+								data-lang="farm">
+								Farm
+							</a>
+						</div>
+					</div>
+
+
+					<div class="card swapcard">
+						<div class="card-body">
+							<span class="badge badge-warning yield-badge">2x</span>
+							<span class="badge badge-success time-badge decresebadge" style="display: none;"><span
+									data-lang="decrease"></span> : <span class="reducetime">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge startbadge" style="display: none;"><span
+									data-lang="starttime"></span> : <span class="starttime">12h20m30s</span> </span>
+							<span class="badge badge-success time-badge endbadge" style="display: none;"><span
+									data-lang="endbadge"></span></span>
+							<div class="token usdc"></div>
+							<h6 class="card-subtitle mb-2 text-warning">USDC</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldusdc">---.-%</span></H3>
+							<a href="#poolusdc" onclick="nav('poolusdc')" class="card-link btn btn-primary btn-lg"
+								data-lang="farm">
+								Farm
+							</a>
+						</div>
+					</div>
+
+
+					<div class="card swapcard ">
+						<span class="badge badge-warning yield-badge">2x</span>
+						<span class="badge badge-success time-badge decresebadge" style="display: none;"><span
+								data-lang="decrease"></span> : <span class="reducetime">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge startbadge" style="display: none;"><span
+								data-lang="starttime"></span> : <span class="starttime">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge endbadge" style="display: none;"><span
+								data-lang="endbadge"></span></span>
+						<div class="card-body">
+							<div class="tokenpair">
+								<div class="token wbtc"></div>
+							</div>
+							<h6 class="card-subtitle mb-2 text-warning">WBTC</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldwbtc">---.-%</span></H3>
+							<a href="#poolwbtc" onclick="nav('poolwbtc')" class="card-link btn btn-primary btn-lg"
+								data-lang="farm">
+								Farm
+							</a>
+							<a href="https://info.uniswap.org/pair/0xd3d2e2692501a5c9ca623199d38826e513033a17"
+								target="_blank" class="card-link btn btn-primary btn-lg" data-lang="trade">
+								Trade
+							</a>
+						</div>
+					</div>
+
+					<div class="card swapcard ">
+						<span class="badge badge-warning yield-badge">2x</span>
+						<span class="badge badge-success time-badge decresebadge" style="display: none;"><span
+								data-lang="decrease"></span> : <span class="reducetime">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge startbadge" style="display: none;"><span
+								data-lang="starttime"></span> : <span class="starttime">12h20m30s</span> </span>
+						<span class="badge badge-success time-badge endbadge" style="display: none;"><span
+								data-lang="endbadge"></span></span>
+						<div class="card-body">
+							<div class="tokenpair">
+								<div class="token1 eth"></div>
+								<div class="token2 usdt"></div>
+							</div>
+							<h6 class="card-subtitle mb-2 text-warning">ETH/USDT UniV2-LP</h6>
+							<H3 class="card-text apy0">APY <span class="poolyieldethusdt">---.-%</span></H3>
+							<a href="#pooleth/usdt" onclick="nav('pooleth/usdt')"
+								class="card-link btn btn-primary btn-lg" data-lang="farm">
+								Farm
+							</a>
+							<a href="https://info.uniswap.org/pair/0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"
+								target="_blank" class="card-link btn btn-primary btn-lg" data-lang="trade">
+								Trade
+							</a>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<main role="main" class="inner cover pool" style="display:none" id="singlepool">
+				<img src="images/hotpoticon.png" height="150" class="mb-4" />
+				<h1 class="cover-heading "><span class="farmname"></span> <span data-lang="farmname"> FARM</span></h1>
+				<p class="lead"></p>
+				<div class="row">
+					<div class="card hide web3true col-md-12 col-12">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="tokenclaim">HOTPOT CLAIM</h6>
+							<H3 class="card-text rewardbalance">-.----</H3>
+							<a href="#" class="card-link btn btn-primary btn-lg" onclick="Stake.claimFree()"><span
+									data-lang="claimfree">CLAIM</span></a>
+							<p id="claimtimep">(<span data-lang="claimtime"></span> ：<span
+									id="claimtime">23h10m</span>)</p>
+							<a href="#" class="card-link btn btn-primary btn-lg" onclick="Stake.claimNFT()"
+								data-lang="claimnft">CLAIM</a>
+						</div>
+					</div>
+					<div class="card hide web3true  col-md-6 col-12">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="totalstake">Total Staked</h6>
+							<H3 class="card-text totalstake">-.----</H3>
+							<div class="not-approved-spend">
+								<a href="#" class="card-link btn btn-primary btn-lg" id="approvestake"
+									onclick="Stake.approve()" data-lang="approvestake">APPROVE STAKE</a>
+							</div>
+							<div class="approved-spend">
+								<a href="#" class="card-link btn btn-primary btn-lg" onclick="Stake.stake()"
+									data-lang="stake">STAKE</a>
+							</div>
+
+						</div>
+					</div>
+					<div class="card hide web3true col-md-6 col-12">
+						<div class="card-body">
+							<h6 class="card-subtitle mb-2 text-warning" data-lang="yourstake">Your Staked</h6>
+							<H3 class="card-text stakedbalance">-.----</H3>
+							<a href="#" class="card-link btn btn-primary btn-lg" onclick="Stake.withdraw()"
+								data-lang="withdraw">WITHDRAW</a>
+						</div>
+
+					</div>
+
+				</div>
+				<p style="margin-top: 3%!important;" data-lang="stakeinfo"></p>
+				<p style="margin-top: 1%;"><span data-lang="inviteintro"></span> <span class="cliamratio">
+						5%</span><span data-lang="inviteinfo1"></span></p>
+				<p style="margin-top: 1%;" data-lang="inviteinfo2"></p>
+
+				<button class='green button' data-lang='invitea' onclick="nav('invite')" hidden>INVITE</button>
+			</main>
+
+
+			<div class="pricingTable" id="pricingTable" style="display: none; color:black;width: 100%!important;">
+			</div>
+
+
+			<div class="pricingTable" style="display: none; color:black;width: 100%!important;" hidden>
+				<ul class='pricingTable-firstTable'>
+					<li class='pricingTable-firstTable_table'>
+						<h1 class='pricingTable-firstTable_table__header'>
+							<span data-lang='grade1mb'></span>
+						</h1>
+						<p class='pricingTable-firstTable_table__pricing'>
+							<span>ID:</span><span></span>
+						</p>
+						<ul class='pricingTable-firstTable_table__options'></ul>
+						<table>
+							<tr>
+								<th style="background-color: white!important;">
+									<div data-lang='loan' class='pricingTable-firstTable_table__getstart'></div>
+								</th>
+								<th style="background-color: white!important;">
+									<div data-lang='sell' class='pricingTable-firstTable_table__getstart'></div>
+								</th>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+	<footer class="mastfoot footer">
+		<div class="inner">
+				<select id="selectcontract"></select>
+				<select id="selectpoolcontract"></select>
+				<br /><br />
+				<a href="https://twitter.com/dex_hot" target="_blank">Twitter</a>&mdash;
+				<a href="https://t.me/hotpotdex" target="_blank">Telegram</a>&mdash;
+				<a href="https://medium.com/@dex-hot" target="_blank">Medium</a>&mdash;
+				<a id="awhitepaper" href="http://docs.hotpotdex.io/" target="_blank"
+					data-lang="whitepaper">Whitepaper</a>
+		</div>
+	</footer>
+
+</body>
+<script src="js/jquery.i18n.properties-1.0.9.js"></script>
+
+<script>
+	var language_pack = {
+		now_lang: 0, // 0:ch,1:en
+		loadProperties: function (new_lang) {
+			var self = this;
+			var tmp_lang = '';
+			if (new_lang == 0) {
+				tmp_lang = 'zh';
+				$('body').removeClass('en').addClass('zh');
+				$("#awhitepaper").attr('href', "http://docs.hotpotdex.io/chinese");
+			} else {
+				tmp_lang = 'en';
+				$('body').removeClass('zh').addClass('en');
+				$("#awhitepaper").attr('href', "http://docs.hotpotdex.io/");
+			}
+			jQuery.i18n.properties({
+				name: 'strings',
+				path: 'language/',
+				language: tmp_lang,
+				cache: false,
+				mode: 'map',
+				callback: function () {
+					for (var i in $.i18n.map) {
+						$('[data-lang="' + i + '"]').text($.i18n.map[i]);
+					}
+					document.title = $.i18n.map['string_title'];
+				}
+			});
+			self.now_lang = new_lang;
+		}
+	}
+
+	function getSearchString(key, Url) {
+		var str = Url;
+		str = str.substring(1, str.length);
+		var arr = str.split("&");
+		var obj = new Object();
+		for (var i = 0; i < arr.length; i++) {
+			var tmp_arr = arr[i].split("=");
+			obj[decodeURIComponent(tmp_arr[0])] = decodeURIComponent(tmp_arr[1]);
+		}
+		return obj[key];
+	}
+
+	$(document).ready(function () {
+		var search = window.location.search;
+		var lang = getSearchString('lang', search);
+		if (lang === "en")
+			language_pack.loadProperties(1);
+		else
+			language_pack.loadProperties(0);
+	});
+
+</script>
+
+</html>
