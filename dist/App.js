@@ -99319,7 +99319,7 @@ var defaultAccount = null;
 var defaultBalance = 0;
 var currentPagePoolID = "";
 var currentPage = "";
-var printLog = true;
+var printLog = false;
 
 function formatFomoTime(t) {
     if (t < 0) {
@@ -101451,7 +101451,7 @@ Reward = {
         contractsInstance.Reward.methods.calNormalReward(1).call(function (e, result) {
             if (e) {
                 toastAlert("Error with calReward:" + e);
-                return console.error('Error with getReward:', e);
+                return console.error('Error with getReward:', e.message);
             }
 
             var total = (result / Math.pow(10, 18)).toFixed(2);
@@ -101484,8 +101484,8 @@ Reward = {
 
         contractsInstance.Reward.methods.getReward(id).send({ from: defaultAccount }, function (e, result) {
             if (e) {
-                toastAlert("Error with getReward:" + e);
-                return console.error('Error with getReward:', e);
+                toastAlert("Error with getReward:" + e.message);
+                return console.error('Error with getReward:', e.message);
             }
             showTopMsg("Pending...", 0, getEthersanUrl(result));
             startListenTX(result);
@@ -101583,7 +101583,11 @@ Stake = {
         }
         Stake.maxEnable = false;
         document.getElementById("popTitle").innerHTML = "Stake";
-        var userBalance = (stakeInfos[currentPagePoolID].userBalance / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
+        var ratio = 1;
+        if(currentPagePoolID=='eth/usdt'){
+            ratio = 10**4;
+        }
+        var userBalance = (stakeInfos[currentPagePoolID].userBalance * ratio / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
         $('#maxAvaliable').text(userBalance);
         document.getElementById('stakeInput').value = 0;
         $("#withdrawdiv").hide();
@@ -101598,7 +101602,11 @@ Stake = {
         }
         Stake.maxEnable = false;
         document.getElementById("popTitle").innerHTML = "WithDraw";
-        var userStake = (stakeInfos[currentPagePoolID].userStake / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
+        var ratio = 1;
+        if(currentPagePoolID=='eth/usdt'){
+            ratio = 10**4;
+        }
+        var userStake = (stakeInfos[currentPagePoolID].userStake * ratio / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
         $('#maxAvaliable').text(userStake);
         document.getElementById('stakeInput').value = 0;
         $("#withdrawdiv").show();
@@ -101621,6 +101629,9 @@ Stake = {
                 toastAlert(getString('withdrawcannotbezero'));
                 return;
             }
+            if(currentPagePoolID=='eth/usdt'){
+                stake = stake/10**4;
+            }
             var num = new BigNumber(stake * Math.pow(10, token.decimals));
             if(Stake.maxEnable){
                 num = token.userStake;
@@ -101632,7 +101643,8 @@ Stake = {
             var hex = web3.utils.numberToHex(num);
             token.instance.methods.withdraw(hex).send({ from: defaultAccount }, function (e, result) {
                 if (e) {
-                    return console.error('Error with stake:', e);
+                    toastAlert(e.message);
+                    return console.error('Error with stake:', e.message);
                 }
                 showTopMsg("Pending...", 0, getEthersanUrl(result));
                 startListenTX(result);
@@ -101648,6 +101660,9 @@ Stake = {
                 toastAlert(getString('stakecannotbezero'));
                 return;
             }
+            if(currentPagePoolID=='eth/usdt'){
+                stake = stake/10**4;
+            }
             var num = new BigNumber(stake * Math.pow(10, token.decimals));
             if(Stake.maxEnable){
                 num = token.userBalance;
@@ -101659,7 +101674,8 @@ Stake = {
             var hex = web3.utils.numberToHex(num);
             token.instance.methods.stake(hex).send({ from: defaultAccount }, { from: defaultAccount }, function (e, result) {
                 if (e) {
-                    return console.error('Error with stake:', e);
+                    toastAlert(e.message);
+                    return console.error('Error with stake:', e.message);
                 }
                 showTopMsg("Pending...", 0, getEthersanUrl(result));
                 startListenTX(result);
@@ -101814,7 +101830,7 @@ Stake = {
                 return;
             }
             if (err) {
-                return console.error('Error with stake:', err);
+                return console.error('Error with stake:', err.message);
             }
             if (result) {
                 if (checkSameEvent(result)) {
@@ -101835,7 +101851,7 @@ Stake = {
                 return;
             }
             if (err) {
-                return console.error('Error with stake:', err);
+                return console.error('Error with stake:', err.message);
             }
             if (result) {
                 // if(printLog)console.log('eventResult:', eventResult);
@@ -101856,7 +101872,7 @@ Stake = {
                 return;
             }
             if (err) {
-                return console.error('Error with stake:', err);
+                return console.error('Error with stake:', err.message);
             }
             if (result) {
                 if (checkSameEvent(result)) {
