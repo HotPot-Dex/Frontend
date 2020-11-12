@@ -101741,13 +101741,18 @@ Stake = {
         var stakeDecimals = token.decimals;
         let totalStake = token.poolTotalStake;
         // if(printLog)console.log("totalStake=" + totalStake);
-
-        $('.totalstake').text((totalStake.div(Math.pow(10, stakeDecimals))).toFixed(2) + " " + name);
+        if(name=='eth/usdt'){
+            totalStake = totalStake.times(10**4);
+        }
+        $('.totalstake').text((totalStake.div(Math.pow(10, stakeDecimals))).toFixed(4) + " " + name);
         // pools[name].poolTotalStake = totalStake;
 
         let userStake = token.userStake;
+        if(name=='eth/usdt'){
+            userStake = userStake.times(10**4);
+        }
         // if(printLog)console.log("userStake=" + userStake);
-        $('.stakedbalance').text((userStake.div(Math.pow(10, stakeDecimals))).toFixed(2) + " " + name);
+        $('.stakedbalance').text((userStake.div(Math.pow(10, stakeDecimals))).toFixed(4) + " " + name);
 
         $('#stakeToken').text(name + " ");
 
