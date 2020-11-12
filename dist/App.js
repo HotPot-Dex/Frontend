@@ -102192,8 +102192,8 @@ App = {
             ETHENV.init(chain);
             return App.initWallet();
         } else {
-            if (App.enableWalletConnect)
-                App.connectWallet();
+            // if (App.enableWalletConnect)
+            //     App.connectWallet();
         }
     },
 
