@@ -99346,7 +99346,7 @@ function hideAlert() {
 function showSellAlert(id) {
     document.getElementById("popTitle").innerHTML = "Sell";
     document.getElementById('stakeInput').value = 0;
-    $("#sellToken").text(getString('sellnftid')+" : " + id);
+    $("#sellToken").text(getString('sellnftid') + " : " + id);
     $(".popTitle").text(getString('selltitle'));
     $(".popTitle").attr('data-lang', 'selltitle');
     $("#loandiv").hide();
@@ -99360,7 +99360,7 @@ function showSellAlert(id) {
 
 function showLoanAlert(id) {
     document.getElementById('stakeInput').value = 0;
-    $("#sellToken").text(getString('loannftid')+" : " + id);
+    $("#sellToken").text(getString('loannftid') + " : " + id);
     $(".popTitle").text(getString('loantitlepop'));
     $(".popTitle").attr('data-lang', 'loantitlepop');
     $("#loandiv").show();
@@ -99375,7 +99375,7 @@ function showLoanAlert(id) {
 
 function showBorrowAlert(id) {
     document.getElementById('stakeInput').value = 0;
-    $("#sellToken").text(getString('loannftid')+" : " + id);
+    $("#sellToken").text(getString('loannftid') + " : " + id);
     $(".popTitle").text(getString('loantitlepop'));
     $(".popTitle").attr('data-lang', 'loantitlepop');
     $("#loandiv").hide();
@@ -99582,7 +99582,7 @@ var contractsInstance = {};
 
 var contractList = ['nft', 'hotpot', 'gacha', 'loan', 'market', 'reward', 'invite', 'reserve'];
 
-var etherscanPrefix="https://etherscan.io/";
+var etherscanPrefix = "https://etherscan.io/";
 
 var mainContracts = {
     "nft": "0xDd9b3510ad3407f534FD1309632152f708831061",
@@ -99639,9 +99639,9 @@ var ropstenPool = {
 }
 
 var ropstenStakeERC = {
-    "usdt": "",  
-    "eth/usdt": "",  
-    "usdc": "",  
+    "usdt": "",
+    "eth/usdt": "",
+    "usdc": "",
     "wbtc": "",
     "hotpot/eth": ""
 }
@@ -99656,9 +99656,9 @@ var rinkebyPool = {
 }
 
 var rinkebyStakeERC = {
-    "usdt": "",  
-    "eth/usdt": "",  
-    "usdc": "",  
+    "usdt": "",
+    "eth/usdt": "",
+    "usdc": "",
     "wbtc": "",
     "hotpot/eth": ""
 }
@@ -99673,9 +99673,9 @@ var ganachePool = {
 }
 
 var ganacheStakeERC = {
-    "usdt": "",  
-    "eth/usdt": "",  
-    "usdc": "",  
+    "usdt": "",
+    "eth/usdt": "",
+    "usdc": "",
     "wbtc": "",
     "hotpot/eth": ""
 }
@@ -99730,15 +99730,15 @@ function setChainId(chainId) {
 
 }
 
-function initContractAddress(){
+function initContractAddress() {
     var prefix = "https://etherscan.io/address/";
     if (ETHENV.chainId === ChainId[0]) {
-       
+
     } else if (ETHENV.chainId === ChainId[1]) {
         prefix = "https://ropsten.etherscan.io/address/";
     }
     else if (ETHENV.chainId === ChainId[2]) {
-        prefix="https://rinkeby.etherscan.io/address/";
+        prefix = "https://rinkeby.etherscan.io/address/";
     }
     etherscanPrefix = prefix;
     // for (let i = 0; i < contractList.length; i++) {
@@ -100097,7 +100097,7 @@ Loan = {
     historyList: {},
     historyTimes: [],
     historyLength: 0,
-    threadtime:10*60,
+    threadtime: 10 * 60,
     getLoan: function () {
         Loan.initLoanTable();
         contractsInstance.HotPot.methods.allowance(defaultAccount, contractsInstance.Loan._address).call(function (e, r) {
@@ -100352,7 +100352,7 @@ Loan = {
     addNFTToTable: function (nft) {
         var lasttime = nft.days * (86400) + (nft.startTime);
         var timenow = Math.floor((new Date()).getTime() / 1000);
-        if (timenow > lasttime-Loan.threadtime) {
+        if (timenow > lasttime - Loan.threadtime) {
             if (printLog) console.log("this token is out of date");
             return;
         }
@@ -101120,19 +101120,19 @@ UserNFT = {
                 }
             });
             UserNFT.updateNFTTable();
-            if(printLog) console.log("UseTicket set id="+tokenId);
+            if (printLog) console.log("UseTicket set id=" + tokenId);
 
             contractsInstance.NFTHotPot.events.UseTicket({ filter: { tokenId: tokenId } }, function (e, r) {
-                if(printLog) console.log("UseTicket id="+r.returnValues.tokenId);
+                if (printLog) console.log("UseTicket id=" + r.returnValues.tokenId);
                 var id = parseInt(r.returnValues.tokenId);
-                if (UserNFT.borrowNFTs[id].grade==0) {
+                if (UserNFT.borrowNFTs[id].grade == 0) {
                     return;
                 }
                 if (checkSameEvent(r)) {
                     return;
                 }
                 if (printLog) console.log("nft UseTicket tokenid=" + r.returnValues.tokenId);
-                
+
                 var time = parseInt(r.returnValues.useTime);
                 UserNFT.borrowNFTs[id].usetime = time;
                 UserNFT.updateNFTTable();
@@ -101169,15 +101169,15 @@ UserNFT = {
 
             contractsInstance.NFTHotPot.events.UseTicket({ filter: { tokenId: id } }, function (e, r) {
                 var id = parseInt(r.returnValues.tokenId);
-                if(printLog) console.log("UseTicket id="+r.returnValues.tokenId);
-                if (UserNFT.borrowNFTs[id].grade==0) {
+                if (printLog) console.log("UseTicket id=" + r.returnValues.tokenId);
+                if (UserNFT.borrowNFTs[id].grade == 0) {
                     return;
                 }
                 if (checkSameEvent(r)) {
                     return;
                 }
                 if (printLog) console.log("nft UseTicket tokenid=" + r.returnValues.tokenId);
-               
+
                 var time = parseInt(r.returnValues.useTime);
                 UserNFT.borrowNFTs[id].usetime = time;
                 UserNFT.updateNFTTable();
@@ -101496,7 +101496,7 @@ Reward = {
 Stake = {
     count: 0,
     cliamTimer: null,
-    maxEnable:false,
+    maxEnable: false,
     notifyRewardAmount: function (token, amount) {
         var amount = web3.utils.numberToHex(new BigNumber(amount * 10 ** 18));
         stakeInfos[token].instance.methods.notifyRewardAmount(amount).send({ from: defaultAccount }, function (e, result) {
@@ -101584,8 +101584,8 @@ Stake = {
         Stake.maxEnable = false;
         document.getElementById("popTitle").innerHTML = "Stake";
         var ratio = 1;
-        if(currentPagePoolID=='eth/usdt'){
-            ratio = 10**4;
+        if (currentPagePoolID == 'eth/usdt') {
+            ratio = 10 ** 4;
         }
         var userBalance = (stakeInfos[currentPagePoolID].userBalance * ratio / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
         $('#maxAvaliable').text(userBalance);
@@ -101603,8 +101603,8 @@ Stake = {
         Stake.maxEnable = false;
         document.getElementById("popTitle").innerHTML = "WithDraw";
         var ratio = 1;
-        if(currentPagePoolID=='eth/usdt'){
-            ratio = 10**4;
+        if (currentPagePoolID == 'eth/usdt') {
+            ratio = 10 ** 4;
         }
         var userStake = (stakeInfos[currentPagePoolID].userStake * ratio / Math.pow(10, stakeInfos[currentPagePoolID].decimals)).toFixed(4);
         $('#maxAvaliable').text(userStake);
@@ -101629,14 +101629,14 @@ Stake = {
                 toastAlert(getString('withdrawcannotbezero'));
                 return;
             }
-            if(currentPagePoolID=='eth/usdt'){
-                stake = stake/10**4;
+            if (currentPagePoolID == 'eth/usdt') {
+                stake = stake / 10 ** 4;
             }
             var num = new BigNumber(stake * Math.pow(10, token.decimals));
-            if(Stake.maxEnable){
+            if (Stake.maxEnable) {
                 num = token.userStake;
             }
-            if(token.userStake.lt(num)){
+            if (token.userStake.lt(num)) {
                 toastAlert(getString('noenoughwithdraw'));
                 return;
             }
@@ -101660,14 +101660,14 @@ Stake = {
                 toastAlert(getString('stakecannotbezero'));
                 return;
             }
-            if(currentPagePoolID=='eth/usdt'){
-                stake = stake/10**4;
+            if (currentPagePoolID == 'eth/usdt') {
+                stake = stake / 10 ** 4;
             }
             var num = new BigNumber(stake * Math.pow(10, token.decimals));
-            if(Stake.maxEnable){
+            if (Stake.maxEnable) {
                 num = token.userBalance;
             }
-            if(token.userBalance.lt(num)){
+            if (token.userBalance.lt(num)) {
                 toastAlert(getString('noenoughstake'));
                 return;
             }
@@ -101741,15 +101741,15 @@ Stake = {
         var stakeDecimals = token.decimals;
         let totalStake = token.poolTotalStake;
         // if(printLog)console.log("totalStake=" + totalStake);
-        if(name=='eth/usdt'){
-            totalStake = totalStake.times(10**4);
+        if (name == 'eth/usdt') {
+            totalStake = totalStake.times(10 ** 4);
         }
         $('.totalstake').text((totalStake.div(Math.pow(10, stakeDecimals))).toFixed(4) + " " + name);
         // pools[name].poolTotalStake = totalStake;
 
         let userStake = token.userStake;
-        if(name=='eth/usdt'){
-            userStake = userStake.times(10**4);
+        if (name == 'eth/usdt') {
+            userStake = userStake.times(10 ** 4);
         }
         // if(printLog)console.log("userStake=" + userStake);
         $('.stakedbalance').text((userStake.div(Math.pow(10, stakeDecimals))).toFixed(4) + " " + name);
@@ -102011,7 +102011,7 @@ Stake = {
 
         let apy = aps * 60 * 60 * 24 * 365;
 
-        if (printLog) console.log("totalStakePrice=" + totalStakePrice + ",apy=" + apy+",token="+name);
+        if (printLog) console.log("totalStakePrice=" + totalStakePrice + ",apy=" + apy + ",token=" + name);
 
         stakeToken.apy = apy;
 
@@ -102049,58 +102049,56 @@ App = {
         App.createSeletPoolContract();
         return App.initWeb3();
     },
-    createSeletcContract:function(){
+    createSeletcContract: function () {
         var obj = document.getElementById('selectcontract');
-		$("#selectcontract").unbind('change');
-		obj.options.length = 0;
-		obj.options.add(new Option($.i18n.map['contractselet'], ""));
-		for (var i = 0; i < contractList.length; i++) {
-			var contract = contractList[i];
-			var value = getString(contract + "contract");
-			obj.options.add(new Option(value, contract));
-		}
-		$("#selectcontract").change(function () {
-			var val = $("#selectcontract").val();
-			if(val!=null && val.length!=0)
-			{
-                var url = etherscanPrefix + contractAddress[val]+"#code";
+        $("#selectcontract").unbind('change');
+        obj.options.length = 0;
+        obj.options.add(new Option($.i18n.map['contractselet'], ""));
+        for (var i = 0; i < contractList.length; i++) {
+            var contract = contractList[i];
+            var value = getString(contract + "contract");
+            obj.options.add(new Option(value, contract));
+        }
+        $("#selectcontract").change(function () {
+            var val = $("#selectcontract").val();
+            if (val != null && val.length != 0) {
+                var url = etherscanPrefix + contractAddress[val] + "#code";
                 window.open(url);
             }
-		});
+        });
     },
-    createSeletPoolContract:function(){
+    createSeletPoolContract: function () {
         var obj = document.getElementById('selectpoolcontract');
-		$("#selectpoolcontract").unbind('change');
-		obj.options.length = 0;
-		obj.options.add(new Option($.i18n.map['poolsselect'], ""));
-		for (var i = 0; i < allPoolTokens.length; i++) {
+        $("#selectpoolcontract").unbind('change');
+        obj.options.length = 0;
+        obj.options.add(new Option($.i18n.map['poolsselect'], ""));
+        for (var i = 0; i < allPoolTokens.length; i++) {
             var contract = allPoolTokens[i];
-            if(contract=='wbtc/eth'){
+            if (contract == 'wbtc/eth') {
                 continue;
             }
 
-			obj.options.add(new Option(contract.toUpperCase(), contract));
-		}
-		$("#selectpoolcontract").change(function () {
-			var val = $("#selectpoolcontract").val();
-			if(val!=null && val.length!=0)
-			{
-                var url = etherscanPrefix + stakePoolAddress[val]+"#code";
+            obj.options.add(new Option(contract.toUpperCase(), contract));
+        }
+        $("#selectpoolcontract").change(function () {
+            var val = $("#selectpoolcontract").val();
+            if (val != null && val.length != 0) {
+                var url = etherscanPrefix + stakePoolAddress[val] + "#code";
                 window.open(url);
             }
-		});
+        });
     },
-    changelang:function(){
+    changelang: function () {
         var new_lang;
-		if (language_pack.now_lang == 0) {
-			new_lang = 1;
-			$("#changelang").text("中");
-		} else {
-			new_lang = 0;
-			$("#changelang").text("EN");
-		}
-		document.cookie = new_lang;
-		language_pack.loadProperties(new_lang);
+        if (language_pack.now_lang == 0) {
+            new_lang = 1;
+            $("#changelang").text("中");
+        } else {
+            new_lang = 0;
+            $("#changelang").text("EN");
+        }
+        document.cookie = new_lang;
+        language_pack.loadProperties(new_lang);
         App.createSeletcContract();
         App.createSeletPoolContract();
     },
@@ -102236,13 +102234,7 @@ App = {
     },
     initContract: function () {
         $("#divloading").show();
-        $.getJSON('contracts/StakePool.json', function (data) {
-            // Get the necessary contract artifact file and instantiate it with truffle-contract.
-            if (printLog) console.log("StakePool create");
-            // contractsInstance.StakePool = new web3.eth.Contract(data.abi);
-            contractABI['stakepool'] = data.abi;
-            return App.getStakePools();
-        });
+       
         $.getJSON('contracts/HotPot.json', function (data) {
             // Get the necessary contract artifact file and instantiate it with truffle-contract.
             contractsInstance.HotPot = new web3.eth.Contract(data.abi, contractAddress.hotpot);
@@ -102262,6 +102254,21 @@ App = {
                 });
                 return Loan.getLoan();
             });
+
+
+            $.getJSON('contracts/NFTMarket.json', function (data) {
+                // Get the necessary contract artifact file and instantiate it with truffle-contract.
+                contractsInstance.NFTMarket = new web3.eth.Contract(data.abi, contractAddress['market']);
+                // contractsInstance.NFTMarket = contractsInstance.NFTMarket.at(contractAddress['market']);
+                return Market.initMarketInfo();
+            });
+            $.getJSON('contracts/StakePool.json', function (data) {
+                // Get the necessary contract artifact file and instantiate it with truffle-contract.
+                if (printLog) console.log("StakePool create");
+                // contractsInstance.StakePool = new web3.eth.Contract(data.abi);
+                contractABI['stakepool'] = data.abi;
+                return App.getStakePools();
+            });
             return App.getBalances();
         });
 
@@ -102277,14 +102284,6 @@ App = {
             contractsInstance.Gacha = new web3.eth.Contract(data.abi, contractAddress.gacha);
             // contractsInstance.Gacha = contractsInstance.Gacha.at(contractAddress.gacha);
             return Gacha.getGacha();
-        });
-
-
-        $.getJSON('contracts/NFTMarket.json', function (data) {
-            // Get the necessary contract artifact file and instantiate it with truffle-contract.
-            contractsInstance.NFTMarket = new web3.eth.Contract(data.abi, contractAddress['market']);
-            // contractsInstance.NFTMarket = contractsInstance.NFTMarket.at(contractAddress['market']);
-            return Market.initMarketInfo();
         });
 
         $.getJSON('contracts/Invite.json', function (data) {
@@ -102523,12 +102522,12 @@ App = {
                     $("#pull10").show();
                     $("#approvegacha").hide();
                 }
-                if(spender==contractAddress.loan.toLowerCase()){
+                if (spender == contractAddress.loan.toLowerCase()) {
                     Loan.allowance = result.returnValues.value;
                     if (printLog) console.log("approval spender=" + result.returnValues.spender);
                     Loan.initLoanTable();
                 }
-                if(spender == contractAddress.market.toLowerCase()){
+                if (spender == contractAddress.market.toLowerCase()) {
                     Market.allowance = result.returnValues.value;
                     if (printLog) console.log("approval spender=" + result.returnValues.spender);
                     Market.initSellTable();
