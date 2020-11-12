@@ -102102,13 +102102,13 @@ App = {
         // Subscribe to accounts change
         provider.on("accountsChanged", (accounts) => {
             if (printLog) console.log(accounts);
-            window.location.reload();
+            // window.location.reload();
         });
 
         // Subscribe to chainId change
         provider.on("chainChanged", (chainId) => {
             if (printLog) console.log(chainId);
-            window.location.reload();
+            // window.location.reload();
         });
 
         // Subscribe to session connection
