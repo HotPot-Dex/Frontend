@@ -101629,10 +101629,10 @@ Stake = {
                 toastAlert(getString('withdrawcannotbezero'));
                 return;
             }
-            var num = new BigNumber(stake * Math.pow(10, token.decimals));
-            if (Stake.maxEnable) {
-                num = token.userStake;
+            if (currentPagePoolID == 'eth/usdt') {
+                stake = stake / 10 ** 4;
             }
+            var num = new BigNumber(stake * Math.pow(10, token.decimals));
             if (Stake.maxEnable) {
                 num = token.userStake;
             }
