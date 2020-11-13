@@ -101450,7 +101450,7 @@ Reward = {
         });
         contractsInstance.Reward.methods.calNormalReward(1).call(function (e, result) {
             if (e) {
-                toastAlert("Error with calReward:" + e);
+                toastAlert("Error with calReward:" + e.message);
                 return console.error('Error with getReward:', e.message);
             }
 
@@ -101629,10 +101629,10 @@ Stake = {
                 toastAlert(getString('withdrawcannotbezero'));
                 return;
             }
-            if (currentPagePoolID == 'eth/usdt') {
-                stake = stake / 10 ** 4;
-            }
             var num = new BigNumber(stake * Math.pow(10, token.decimals));
+            if (Stake.maxEnable) {
+                num = token.userStake;
+            }
             if (Stake.maxEnable) {
                 num = token.userStake;
             }
@@ -101716,6 +101716,7 @@ Stake = {
                 total = total.minus(balanceOfHotpot[token]);
         }
         total = total.minus(200000 * 10 ** 18);
+        total = total.plus(stakeInfos['hotpot'].poolTotalStake);
         total = total.div(Math.pow(10, 18));
         if (printLog) console.log("calTotalCirculation=" + total);
         $("#totalcir").text(total.toFixed(2));
@@ -101856,7 +101857,7 @@ Stake = {
                 return;
             }
             if (err) {
-                return console.error('Error with stake:', err.message);
+                return console.error('Error with stake:', err);
             }
             if (result) {
                 // if(printLog)console.log('eventResult:', eventResult);
@@ -101877,7 +101878,7 @@ Stake = {
                 return;
             }
             if (err) {
-                return console.error('Error with stake:', err.message);
+                return console.error('Error with stake:', err);
             }
             if (result) {
                 if (checkSameEvent(result)) {
@@ -101956,6 +101957,9 @@ Stake = {
             result = new BigNumber(result);
             if (printLog) console.log("initSinglePool pool=" + poolName + ",totalSupply:" + result);
             stakeInfos[poolName].poolTotalStake = result;
+            if(poolName=='hotpot'){
+                Stake.calTotalCirculation();
+            }
             stakeInfos[poolName].instance.methods.balanceOf(defaultAccount).call(function (e, result) {
                 if (printLog) console.log("initSinglePool pool=" + poolName + ",balanceOf:" + result);
                 stakeInfos[poolName].userStake = new BigNumber(result);
@@ -102234,7 +102238,7 @@ App = {
     },
     initContract: function () {
         $("#divloading").show();
-       
+
         $.getJSON('contracts/HotPot.json', function (data) {
             // Get the necessary contract artifact file and instantiate it with truffle-contract.
             contractsInstance.HotPot = new web3.eth.Contract(data.abi, contractAddress.hotpot);
@@ -102255,19 +102259,19 @@ App = {
                 return Loan.getLoan();
             });
 
-
-            $.getJSON('contracts/NFTMarket.json', function (data) {
-                // Get the necessary contract artifact file and instantiate it with truffle-contract.
-                contractsInstance.NFTMarket = new web3.eth.Contract(data.abi, contractAddress['market']);
-                // contractsInstance.NFTMarket = contractsInstance.NFTMarket.at(contractAddress['market']);
-                return Market.initMarketInfo();
-            });
             $.getJSON('contracts/StakePool.json', function (data) {
                 // Get the necessary contract artifact file and instantiate it with truffle-contract.
                 if (printLog) console.log("StakePool create");
                 // contractsInstance.StakePool = new web3.eth.Contract(data.abi);
                 contractABI['stakepool'] = data.abi;
                 return App.getStakePools();
+            });
+
+            $.getJSON('contracts/NFTMarket.json', function (data) {
+                // Get the necessary contract artifact file and instantiate it with truffle-contract.
+                contractsInstance.NFTMarket = new web3.eth.Contract(data.abi, contractAddress['market']);
+                // contractsInstance.NFTMarket = contractsInstance.NFTMarket.at(contractAddress['market']);
+                return Market.initMarketInfo();
             });
             return App.getBalances();
         });
